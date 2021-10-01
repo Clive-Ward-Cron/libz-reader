@@ -1,3 +1,5 @@
+// Needs refactoring
+
 const enterBtn = document.querySelector("#enter");
 const newBtn = document.querySelector("#new");
 const readBtn = document.querySelector("#read");
