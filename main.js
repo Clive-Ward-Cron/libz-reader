@@ -6,7 +6,7 @@ const readBtn = document.querySelector("#read");
 const prompt = document.querySelector(".prompt");
 const wordCount = document.querySelector(".count");
 const form = document.querySelector(".input-container");
-const input = document.querySelector("#word-input");
+const wordInput = document.querySelector("#word-input");
 const titleEl = document.querySelector(".title");
 const libz = document.querySelector(".libz");
 const vowels = ["a", "e", "i", "o", "u"];
@@ -16,6 +16,8 @@ const utterance = new SpeechSynthesisUtterance();
 let words = [];
 let speech = [];
 let lib, blanks, title, value;
+let isReading = false;
+let allWordsEntered = false;
 
 function clearInput() {
   form.reset();
@@ -23,12 +25,34 @@ function clearInput() {
 
 async function resetLib() {
   speechSynthesis.cancel();
-  libz.innerText = "";
   lib = await fetchLib();
+  libz.innerText = "";
+  titleEl.innerText = "";
+  allWordsEntered = false;
+  isReading = false;
+  wordInput.removeAttribute("disabled");
+  readBtn.setAttribute("disabled", "");
   words = [];
   speech = [];
   blanks = [...lib.blanks];
   value = [...lib.value];
+}
+
+function restart() {
+  speechSynthesis.cancel();
+  libz.innerText = "";
+  titleEl.innerText = "";
+  allWordsEntered = false;
+  isReading = false;
+  enterBtn.innerText = "Enter";
+  words = [];
+  speech = [];
+  blanks = [...lib.blanks];
+  value = [...lib.value];
+
+  wordInput.removeAttribute("disabled");
+  readBtn.setAttribute("disabled", "");
+  populatePrompt();
 }
 
 function enterBtnToggle(e) {
@@ -37,6 +61,12 @@ function enterBtnToggle(e) {
     enterBtn.classList.add("active");
   } else {
     enterBtn.classList.remove("active");
+    // Don't let user type anymore words into the input;
+    if (allWordsEntered) {
+      this.setAttribute("disabled", true);
+      clearInput();
+      enterBtn.innerText = "RESTART";
+    }
   }
 }
 
@@ -45,25 +75,38 @@ function populatePrompt() {
     prompt.innerText = `Enter ${vowels.includes(blanks[0][0]) ? "an" : "a"} ${blanks[0]}`;
     // console.log(blanks.length);
   } else {
+    allWordsEntered = true;
     prompt.innerText = "All Done!";
   }
   wordCount.innerText = `Blank Count: ${blanks.length}`;
 }
 
-function read() {
-  if (speechSynthesis.speaking) {
-    speechSynthesis.cancel();
-  }
-  speech = chunkSentences(value);
-  speechSynthesis.speak(utterance);
-  utterance.onend = function () {
-    if (speech.length > 0) {
-      utterance.text = speech.shift();
-      speechSynthesis.speak(utterance);
-    } else {
-      utterance.text = "";
+function readToggle() {
+  if (!isReading) {
+    isReading = true;
+    readBtn.innerText = "Stop";
+    if (speechSynthesis.speaking) {
+      speechSynthesis.cancel();
     }
-  };
+    speech = chunkSentences(value);
+    speechSynthesis.speak(utterance);
+    utterance.onend = function () {
+      if (speech.length > 0) {
+        utterance.text = speech.shift();
+        speechSynthesis.speak(utterance);
+      } else {
+        utterance.text = "";
+      }
+    };
+  } else {
+    isReading = false;
+    speech = [];
+    if (speechSynthesis.speaking) {
+      speechSynthesis.cancel();
+    }
+    utterance.text = "";
+    readBtn.innerText = "Read";
+  }
 }
 
 function chunkSentences(list) {
@@ -88,10 +131,14 @@ function generate() {
 
 function submit(e) {
   e.preventDefault();
-  if (!input.value.trim() || words.length === lib?.blanks.length) return;
+  //! Find a better way
+  if (allWordsEntered && e.submitter.id == "enter") {
+    restart();
+  }
+  if (!wordInput.value.trim() || words.length === lib?.blanks.length) return;
   // console.log(e);
 
-  words.push(input.value.trim());
+  words.push(wordInput.value.trim());
   blanks.shift();
   clearInput();
   populatePrompt();
@@ -122,10 +169,10 @@ async function fetchLib() {
   return body;
 }
 
-input.addEventListener("keydown", enterBtnToggle);
-input.addEventListener("keyup", enterBtnToggle);
+wordInput.addEventListener("keydown", enterBtnToggle);
+wordInput.addEventListener("keyup", enterBtnToggle);
 newBtn.addEventListener("click", resetLib);
-readBtn.addEventListener("click", read);
+readBtn.addEventListener("click", readToggle);
 speechSynthesis.addEventListener("voiceschanged", setVoice);
 
 // Fetch a madlib on pageload
