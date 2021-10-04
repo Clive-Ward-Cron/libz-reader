@@ -110,8 +110,8 @@ function setVoice() {
 async function fetchLib() {
   readBtn.setAttribute("disabled", "");
   //! Remove when done testing
-  // const res = await fetch("http://madlibz.herokuapp.com/api/random");
-  const res = await fetch("http://madlibz.herokuapp.com/api/random?maxlength=10");
+  const res = await fetch("http://madlibz.herokuapp.com/api/random");
+  // const res = await fetch("http://madlibz.herokuapp.com/api/random?maxlength=10");
   const body = await res.json();
   if (body.title === "Hello ____!") return fetchLib();
   // console.log(body);
