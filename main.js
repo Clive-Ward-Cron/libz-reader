@@ -14,7 +14,7 @@ const vowels = ["a", "e", "i", "o", "u"];
 const utterance = new SpeechSynthesisUtterance();
 
 let words = [];
-let speech;
+let speech = [];
 let lib, blanks, title, value;
 
 function clearInput() {
@@ -26,6 +26,9 @@ async function resetLib() {
   libz.innerText = "";
   lib = await fetchLib();
   words = [];
+  speech = [];
+  blanks = [...lib.blanks];
+  value = [...lib.value];
 }
 
 function enterBtnToggle(e) {
@@ -40,7 +43,7 @@ function enterBtnToggle(e) {
 function populatePrompt() {
   if (blanks.length !== 0) {
     prompt.innerText = `Enter ${vowels.includes(blanks[0][0]) ? "an" : "a"} ${blanks[0]}`;
-    console.log(blanks.length);
+    // console.log(blanks.length);
   } else {
     prompt.innerText = "All Done!";
   }
@@ -51,30 +54,42 @@ function read() {
   if (speechSynthesis.speaking) {
     speechSynthesis.cancel();
   }
+  speech = chunkSentences(value);
   speechSynthesis.speak(utterance);
   utterance.onend = function () {
     if (speech.length > 0) {
       utterance.text = speech.shift();
       speechSynthesis.speak(utterance);
+    } else {
+      utterance.text = "";
     }
   };
 }
 
+function chunkSentences(list) {
+  // Uses a lookbehind regex to match groups to split on without including extra.
+  return [...list.split(/(?<=\.|\!|\?)\s*/)];
+}
+
 function generate() {
-  const content = value.slice(0, -1).map((chunk, i) => {
-    console.log(i);
-    return `${chunk}${words[i] ? words[i] : ""}`;
-  });
+  const content = value
+    .slice(0, -1)
+    .map((chunk, i) => {
+      // console.log(i);
+      return `${chunk}${words[i] ? words[i] : ""}`;
+    })
+    .join("");
   titleEl.innerText = lib.title;
-  libz.innerText = content.join("");
-  speech = [...content];
-  console.log(content);
+  libz.innerText = content;
+
+  value = content;
+  // console.log(content);
 }
 
 function submit(e) {
   e.preventDefault();
   if (!input.value.trim() || words.length === lib?.blanks.length) return;
-  console.log(e);
+  // console.log(e);
 
   words.push(input.value.trim());
   blanks.shift();
@@ -88,16 +103,18 @@ function submit(e) {
 
 function setVoice() {
   voices = this.getVoices();
-  console.log(voices);
+  // console.log(voices);
   utterance.voice = voices.find((voice) => voice.name.includes("Google US English"));
 }
 
 async function fetchLib() {
   readBtn.setAttribute("disabled", "");
-  const res = await fetch("http://madlibz.herokuapp.com/api/random");
+  //! Remove when done testing
+  // const res = await fetch("http://madlibz.herokuapp.com/api/random");
+  const res = await fetch("http://madlibz.herokuapp.com/api/random?maxlength=10");
   const body = await res.json();
   if (body.title === "Hello ____!") return fetchLib();
-  console.log(body);
+  // console.log(body);
   blanks = [...body.blanks];
   title = body.title;
   value = body.value;
