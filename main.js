@@ -1,5 +1,6 @@
 // Needs refactoring
 
+// Elements that are used and modified
 const enterBtn = document.querySelector("#enter");
 const newBtn = document.querySelector("#new");
 const readBtn = document.querySelector("#read");
@@ -11,18 +12,26 @@ const titleEl = document.querySelector(".title");
 const libz = document.querySelector(".libz");
 const vowels = ["a", "e", "i", "o", "u"];
 
+// The utterance object for speech synth
 const utterance = new SpeechSynthesisUtterance();
 
+// Base variables to control libz logic
 let words = [];
 let speech = [];
 let lib, blanks, title, value;
 let isReading = false;
 let allWordsEntered = false;
 
+/**
+ * Clear the wordInput for the next word
+ */
 function clearInput() {
   form.reset();
 }
 
+/**
+ * Resets the page and fetches a new lib
+ */
 async function resetLib() {
   speechSynthesis.cancel();
   lib = await fetchLib();
@@ -39,6 +48,9 @@ async function resetLib() {
   value = [...lib.value];
 }
 
+/**
+ * Resets the page and restarts the last used lib.
+ */
 function restart() {
   speechSynthesis.cancel();
   libz.classList.remove("active");
@@ -57,6 +69,12 @@ function restart() {
   populatePrompt();
 }
 
+/**
+ * Toggles the enterBtn animation, disables the wordInput if
+ * the words have all been entered and sets enterBtn to 'RESTART'.
+ * @param {event} e
+ * @returns {VoidFunction}
+ */
 function enterBtnToggle(e) {
   if (e?.which !== 13 || e?.keyCode !== 13) return;
   if (e.type === "keydown") {
@@ -72,6 +90,11 @@ function enterBtnToggle(e) {
   }
 }
 
+/**
+ * Checks if there are more blanks to be filled
+ * in the lib and adds the word request to the
+ * page.
+ */
 function populatePrompt() {
   if (blanks.length !== 0) {
     setTimeout(() => (prompt.innerText = `Enter ${vowels.includes(blanks[0][0]) ? "an" : "a"} ${blanks[0]}`), 250);
@@ -85,6 +108,10 @@ function populatePrompt() {
   wordCount.innerText = `Blank Count: ${blanks.length}`;
 }
 
+/**
+ * Starts SpeechSythesis with added logic
+ * to compensate for speech cut off bug
+ */
 function readToggle() {
   if (!isReading) {
     isReading = true;
@@ -113,11 +140,23 @@ function readToggle() {
   }
 }
 
-function chunkSentences(list) {
+/**
+ * Takes in a string and splits it into an array
+ * of sentences.
+ * @param {string} content
+ * @returns {Array}
+ */
+function chunkSentences(content) {
   // Uses a lookbehind regex to match groups to split on without including extra.
-  return [...list.split(/(?<=\.|\!|\?)\s*/)];
+  return [...content.split(/(?<=\.|\!|\?)\s*/)];
 }
 
+/**
+ * Takes the chunks of the lib 'value' array and
+ * uses the user input from the words array to
+ * create a single string of lib content to be
+ * displayed and read.
+ */
 function generate() {
   const content = value
     .slice(0, -1)
@@ -134,6 +173,12 @@ function generate() {
   // console.log(content);
 }
 
+/**
+ * Takes the word submitted by the user in the wordInput
+ * handles restarting the lib, clearing the input, and
+ * starting prompt population
+ * @param {event} e
+ */
 function submit(e) {
   e.preventDefault();
 
@@ -153,12 +198,20 @@ function submit(e) {
   }
 }
 
+/**
+ * Sets the default voice to be used by SpeechSynthesis
+ */
 function setVoice() {
   voices = this.getVoices();
   // console.log(voices);
   utterance.voice = voices.find((voice) => voice.name.includes("Google US English"));
 }
 
+/**
+ * Async function to fetch a random lib from a madlibz api.
+ * Adds values to the base logic variables and sets the initial prompt
+ * @returns {Object}
+ */
 async function fetchLib() {
   readBtn.setAttribute("disabled", "");
   //! Remove when done testing
@@ -174,19 +227,27 @@ async function fetchLib() {
   return body;
 }
 
+// ----------- Event listeners -----------
+// triggers button animation
 wordInput.addEventListener("keydown", enterBtnToggle);
+// reverts button animation
 wordInput.addEventListener("keyup", enterBtnToggle);
+// triggers a new lib to be fetched
 newBtn.addEventListener("click", resetLib);
+// triggers the finished lib to be read by SpeechSynth
 readBtn.addEventListener("click", readToggle);
+// Changes the default SpeechSynth voice
 speechSynthesis.addEventListener("voiceschanged", setVoice);
 
-// Fetch a madlib on pageload
+// Fetches an inital lib to start with on page load.
 (async () => {
   speechSynthesis.cancel();
 
   lib = await fetchLib();
 
+  // attach the event listeners to the form here
   form.addEventListener("submit", submit);
+  // prevents held keys spam
   form.addEventListener("keydown", (e) => {
     if (e.repeat) {
       e.preventDefault();
