@@ -26,6 +26,7 @@ function clearInput() {
 async function resetLib() {
   speechSynthesis.cancel();
   lib = await fetchLib();
+  libz.classList.remove("active");
   libz.innerText = "";
   titleEl.innerText = "";
   allWordsEntered = false;
@@ -40,6 +41,7 @@ async function resetLib() {
 
 function restart() {
   speechSynthesis.cancel();
+  libz.classList.remove("active");
   libz.innerText = "";
   titleEl.innerText = "";
   allWordsEntered = false;
@@ -72,12 +74,14 @@ function enterBtnToggle(e) {
 
 function populatePrompt() {
   if (blanks.length !== 0) {
-    prompt.innerText = `Enter ${vowels.includes(blanks[0][0]) ? "an" : "a"} ${blanks[0]}`;
+    setTimeout(() => (prompt.innerText = `Enter ${vowels.includes(blanks[0][0]) ? "an" : "a"} ${blanks[0]}`), 250);
+    wordInput.focus();
     // console.log(blanks.length);
   } else {
     allWordsEntered = true;
     prompt.innerText = "All Done!";
   }
+  setTimeout(() => prompt.classList.add("active"), 250);
   wordCount.innerText = `Blank Count: ${blanks.length}`;
 }
 
@@ -124,6 +128,7 @@ function generate() {
     .join("");
   titleEl.innerText = lib.title;
   libz.innerText = content;
+  libz.classList.add("active");
 
   value = content;
   // console.log(content);
@@ -131,13 +136,13 @@ function generate() {
 
 function submit(e) {
   e.preventDefault();
+
   //! Find a better way
   if (allWordsEntered && e.submitter.id == "enter") {
     restart();
   }
   if (!wordInput.value.trim() || words.length === lib?.blanks.length) return;
-  // console.log(e);
-
+  prompt.classList.remove("active");
   words.push(wordInput.value.trim());
   blanks.shift();
   clearInput();
