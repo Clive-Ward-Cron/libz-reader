@@ -10,12 +10,12 @@ const form = document.querySelector(".input-container");
 const wordInput = document.querySelector("#word-input");
 const titleEl = document.querySelector(".title");
 const libz = document.querySelector(".libz");
-const vowels = ["a", "e", "i", "o", "u"];
 
 // The utterance object for speech synth
 const utterance = new SpeechSynthesisUtterance();
 
 // Base variables to control libz logic
+const vowels = ["a", "e", "i", "o", "u"];
 let words = [];
 let speech = [];
 let lib, blanks, title, value;
@@ -30,16 +30,20 @@ function clearInput() {
 }
 
 /**
- * Resets the page and fetches a new lib
+ * Cancels SpeechSynth, Clears Inputs, and reverts
+ * variables and elements to a default state. Then
+ * it populates the blanks and value arrays with
+ * the values found in the lib object.
  */
-async function resetLib() {
+function beginReset() {
   speechSynthesis.cancel();
-  lib = await fetchLib();
+  clearInput();
   libz.classList.remove("active");
   libz.innerText = "";
   titleEl.innerText = "";
   allWordsEntered = false;
   isReading = false;
+  enterBtn.innerText = "Enter";
   wordInput.removeAttribute("disabled");
   readBtn.setAttribute("disabled", "");
   words = [];
@@ -49,23 +53,20 @@ async function resetLib() {
 }
 
 /**
+ * Resets the page and fetches a new lib
+ */
+async function resetLib() {
+  // Set the lib object to be a new lib from the api
+  lib = await fetchLib();
+  beginReset();
+  populatePrompt();
+}
+
+/**
  * Resets the page and restarts the last used lib.
  */
 function restart() {
-  speechSynthesis.cancel();
-  libz.classList.remove("active");
-  libz.innerText = "";
-  titleEl.innerText = "";
-  allWordsEntered = false;
-  isReading = false;
-  enterBtn.innerText = "Enter";
-  words = [];
-  speech = [];
-  blanks = [...lib.blanks];
-  value = [...lib.value];
-
-  wordInput.removeAttribute("disabled");
-  readBtn.setAttribute("disabled", "");
+  beginReset();
   populatePrompt();
 }
 
@@ -223,7 +224,6 @@ async function fetchLib() {
   blanks = [...body.blanks];
   title = body.title;
   value = body.value;
-  populatePrompt();
   return body;
 }
 
@@ -244,6 +244,7 @@ speechSynthesis.addEventListener("voiceschanged", setVoice);
   speechSynthesis.cancel();
 
   lib = await fetchLib();
+  populatePrompt();
 
   // attach the event listeners to the form here
   form.addEventListener("submit", submit);
