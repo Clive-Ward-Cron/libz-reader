@@ -23,6 +23,24 @@ let isReading = false;
 let allWordsEntered = false;
 
 /**
+ * Sanatizes user input that will be displayed
+ * @param {string} string
+ * @returns {string}
+ */
+function sanitize(string) {
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#x27;",
+    "/": "&#x2F;",
+  };
+  const reg = /[&<>"'/]/gi;
+  return string.replace(reg, (match) => map[match]);
+}
+
+/**
  * Clear the wordInput for the next word
  */
 function clearInput() {
@@ -82,12 +100,6 @@ function enterBtnToggle(e) {
     enterBtn.classList.add("active");
   } else {
     enterBtn.classList.remove("active");
-    // Don't let user type anymore words into the input;
-    if (allWordsEntered) {
-      this.setAttribute("disabled", true);
-      clearInput();
-      enterBtn.innerText = "RESTART";
-    }
   }
 }
 
@@ -97,12 +109,22 @@ function enterBtnToggle(e) {
  * page.
  */
 function populatePrompt() {
+  // If there are still blanks, change the prompt
+  // else stop accepting input
   if (blanks.length !== 0) {
+    // setTimeout used to give element time to fade out
+    // before the new prompt is added
     setTimeout(() => (prompt.innerText = `Enter ${vowels.includes(blanks[0][0]) ? "an" : "a"} ${blanks[0]}`), 250);
     wordInput.focus();
-    // console.log(blanks.length);
   } else {
     allWordsEntered = true;
+    clearInput();
+    // remove the active class from the btn
+    // because the keyup event won't be fired
+    // once the input is disabled
+    enterBtn.classList.remove("active");
+    wordInput.setAttribute("disabled", true);
+    enterBtn.innerText = "RESTART";
     prompt.innerText = "All Done!";
   }
   setTimeout(() => prompt.classList.add("active"), 250);
@@ -167,7 +189,8 @@ function generate() {
     })
     .join("");
   titleEl.innerText = lib.title;
-  libz.innerText = content;
+  // libz.innerText = content;
+  libz.innerHTML = content;
   libz.classList.add("active");
 
   value = content;
@@ -189,7 +212,9 @@ function submit(e) {
   }
   if (!wordInput.value.trim() || words.length === lib?.blanks.length) return;
   prompt.classList.remove("active");
-  words.push(wordInput.value.trim());
+  // words.push(wordInput.value.trim());
+  // Adding sanitization to user input
+  words.push(sanitize(wordInput.value.trim()));
   blanks.shift();
   clearInput();
   populatePrompt();
