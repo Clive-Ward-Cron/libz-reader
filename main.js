@@ -5,16 +5,18 @@ const enterBtn = document.querySelector("#enter");
 const newBtn = document.querySelector("#new");
 const readBtn = document.querySelector("#read");
 const prompt = document.querySelector(".prompt");
-const wordCount = document.querySelector(".count");
+const wordCount = document.querySelector(".count span");
 const form = document.querySelector(".input-container");
 const wordInput = document.querySelector("#word-input");
 const titleEl = document.querySelector(".title");
 const libz = document.querySelector(".libz");
+const libzreader = document.querySelector(".libzreader");
 
 // The utterance object for speech synth
 const utterance = new SpeechSynthesisUtterance();
 
 // Base variables to control libz logic
+const delay = 250;
 const vowels = ["a", "e", "i", "o", "u"];
 let words = [];
 let speech = [];
@@ -56,9 +58,8 @@ function clearInput() {
 function beginReset() {
   speechSynthesis.cancel();
   clearInput();
-  libz.classList.remove("active");
-  libz.innerText = "";
-  titleEl.innerText = "";
+  libzreader.classList.remove("active");
+
   allWordsEntered = false;
   isReading = false;
   enterBtn.innerText = "Enter";
@@ -68,6 +69,10 @@ function beginReset() {
   speech = [];
   blanks = [...lib.blanks];
   value = [...lib.value];
+  setTimeout(() => {
+    libz.innerHTML = "";
+    titleEl.innerText = "";
+  }, delay + (1500 - delay));
 }
 
 /**
@@ -109,12 +114,13 @@ function enterBtnToggle(e) {
  * page.
  */
 function populatePrompt() {
+  prompt.classList.remove("active");
   // If there are still blanks, change the prompt
   // else stop accepting input
   if (blanks.length !== 0) {
     // setTimeout used to give element time to fade out
     // before the new prompt is added
-    setTimeout(() => (prompt.innerText = `Enter ${vowels.includes(blanks[0][0]) ? "an" : "a"} ${blanks[0]}`), 250);
+    setTimeout(() => (prompt.innerText = `Enter ${vowels.includes(blanks[0][0]) ? "an" : "a"} ${blanks[0]}`), delay);
     wordInput.focus();
   } else {
     allWordsEntered = true;
@@ -125,10 +131,22 @@ function populatePrompt() {
     enterBtn.classList.remove("active");
     wordInput.setAttribute("disabled", true);
     enterBtn.innerText = "RESTART";
-    prompt.innerText = "All Done!";
+    setTimeout(() => (prompt.innerText = "All Done!"), delay);
   }
-  setTimeout(() => prompt.classList.add("active"), 250);
-  wordCount.innerText = `Blank Count: ${blanks.length}`;
+  setTimeout(() => prompt.classList.add("active"), delay);
+  updateWordCount(blanks.length);
+}
+
+/**
+ * Update the word count displayed
+ * @param {integer|string} count
+ */
+function updateWordCount(count) {
+  wordCount.classList.remove("active");
+  setTimeout(() => {
+    wordCount.innerText = `${count}`;
+    wordCount.classList.add("active");
+  }, delay);
 }
 
 /**
@@ -188,12 +206,11 @@ function generate() {
       return `${chunk}${words[i] ? words[i] : ""}`;
     })
     .join("");
+  libzreader.classList.add("active");
   titleEl.innerText = lib.title;
-  // libz.innerText = content;
   libz.innerHTML = content;
-  libz.classList.add("active");
-
   value = content;
+  readBtn.removeAttribute("disabled");
   // console.log(content);
 }
 
@@ -209,18 +226,22 @@ function submit(e) {
   //! Find a better way
   if (allWordsEntered && e.submitter.id == "enter") {
     restart();
+    return;
   }
   if (!wordInput.value.trim() || words.length === lib?.blanks.length) return;
-  prompt.classList.remove("active");
-  // words.push(wordInput.value.trim());
-  // Adding sanitization to user input
+  // prompt.classList.remove("active");
+  // Adding sanitization to user input and puts it on the end of the array
   words.push(sanitize(wordInput.value.trim()));
+  // Removes the word at index 0 that has already been supplied
   blanks.shift();
+  // Clear the wordInput for the next word
   clearInput();
+  // Change the prompt to as for the next word at index 0 from the blanks array
   populatePrompt();
+  // If the length of the words array is the same the original blanks array,
+  // Generate the full content to be displayed and read
   if (words.length === lib.blanks.length) {
     generate();
-    readBtn.removeAttribute("disabled");
   }
 }
 

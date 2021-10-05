@@ -15,11 +15,10 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  background-color: #3bc1ac;
   display: flex;
   min-height: 100vh;
   align-items: center;
-
+  transition: all 1.5s ease;
   /* Arrows  */
   background: linear-gradient(45deg, #ebebeb 45px, transparent 45px) 64px 64px,
     linear-gradient(45deg, #ebebeb 45px, transparent 45px, transparent 91px, #fff 91px, #fff 135px, transparent 135px),
@@ -66,6 +65,9 @@ body {
 .libzreader .title {
   font-size: 2.5rem;
   text-align: center;
+  min-height: 2.5rem;
+  opacity: 0;
+  transition: all 1.5s ease;
 }
 
 .libzreader p {
@@ -73,14 +75,19 @@ body {
 }
 
 .libz {
-  transition: all 1.5s ease;
+  transition: all 1.5s ease-in-out;
   opacity: 0;
-  max-height: 0;
+  max-height: 20rem;
 }
 
-.libz.active {
+.libzreader.active .libz,
+.libzreader.active .title {
   opacity: 1;
   max-height: 100rem;
+}
+
+.libzreader.active .count span {
+  opacity: 1;
 }
 
 .content {
@@ -88,6 +95,7 @@ body {
 }
 
 .prompt-container {
+  min-height: 5rem;
   width: 100%;
   margin: 0;
   display: flex;
@@ -97,6 +105,12 @@ body {
 .prompt {
   transition: all 0.3s ease;
   opacity: 0;
+  width: 75%;
+  padding-left: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  /* min-height: 2.3rem; */
 }
 
 .prompt.active {
@@ -109,7 +123,18 @@ body {
 
 .count {
   display: flex;
+  justify-content: space-between;
   align-items: flex-end;
+  min-width: 25%;
+}
+
+.count span {
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.count span.active {
+  opacity: 1;
 }
 
 .prompt-container .count {
