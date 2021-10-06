@@ -84,11 +84,11 @@ async function resetLib() {
   // Set the lib object to be a new lib from the api
   try {
     lib = await fetchLib();
+    beginReset();
+    populatePrompt();
   } catch (e) {
     return;
   }
-  beginReset();
-  populatePrompt();
 }
 
 /**
@@ -272,16 +272,16 @@ async function fetchLib() {
   try {
     const res = await fetch("http://madlibz.herokuapp.com/api/random");
     const body = await res.json();
+    if (body.title === "Hello ____!") return fetchLib();
+    blanks = [...body.blanks];
+    title = body.title;
+    value = body.value;
+    return body;
   } catch (e) {
     console.log(e);
     titleEl.innerText = "Unable to Fetch Lib";
     return;
   }
-  if (body.title === "Hello ____!") return fetchLib();
-  blanks = [...body.blanks];
-  title = body.title;
-  value = body.value;
-  return body;
 }
 
 // ----------- Event listeners -----------
@@ -301,21 +301,21 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 
 // Fetches an inital lib to start with on page load.
 (async () => {
-  speechSynthesis.cancel();
-  copyYear.innerText = new Date().getFullYear();
   try {
+    speechSynthesis.cancel();
+    copyYear.innerText = new Date().getFullYear();
     lib = await fetchLib();
+    populatePrompt();
+
+    // attach the event listeners to the form here
+    form.addEventListener("submit", submit);
+    // prevents held keys spam
+    form.addEventListener("keydown", (e) => {
+      if (e.repeat) {
+        e.preventDefault();
+      }
+    });
   } catch (e) {
     return;
   }
-  populatePrompt();
-
-  // attach the event listeners to the form here
-  form.addEventListener("submit", submit);
-  // prevents held keys spam
-  form.addEventListener("keydown", (e) => {
-    if (e.repeat) {
-      e.preventDefault();
-    }
-  });
 })();
