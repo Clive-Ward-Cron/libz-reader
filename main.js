@@ -280,6 +280,7 @@ async function fetchLib() {
   } catch (e) {
     console.log(e);
     titleEl.innerText = "Unable to Fetch Lib";
+    libzreader.classList.add("active");
     return;
   }
 }
