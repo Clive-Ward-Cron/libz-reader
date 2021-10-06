@@ -84,11 +84,11 @@ async function resetLib() {
   // Set the lib object to be a new lib from the api
   try {
     lib = await fetchLib();
-    beginReset();
-    populatePrompt();
   } catch (e) {
     return;
   }
+  beginReset();
+  populatePrompt();
 }
 
 /**
