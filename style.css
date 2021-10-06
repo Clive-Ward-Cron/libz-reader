@@ -221,3 +221,14 @@ footer {
 footer a {
   color: black;
 }
+
+@media only screen and (max-width: 425px) {
+  body {
+    justify-content: space-between;
+    min-width: 425px;
+  }
+  .libzreader {
+    border-radius: 0;
+    margin: 0;
+  }
+}
