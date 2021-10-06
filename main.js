@@ -64,6 +64,7 @@ function beginReset() {
   isReading = false;
   enterBtn.innerText = "Enter";
   wordInput.removeAttribute("disabled");
+  readBtn.innerText = "Read";
   readBtn.setAttribute("disabled", "");
   words = [];
   speech = [];
@@ -168,6 +169,8 @@ function readToggle() {
         speechSynthesis.speak(utterance);
       } else {
         utterance.text = "";
+        readBtn.innerText = "Read";
+        isReading = false;
       }
     };
   } else {
