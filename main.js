@@ -205,7 +205,6 @@ function generate() {
   const content = value
     .slice(0, -1)
     .map((chunk, i) => {
-      // console.log(i);
       return `${chunk}${words[i] ? words[i] : ""}`;
     })
     .join("");
@@ -214,7 +213,6 @@ function generate() {
   libz.innerHTML = content;
   value = content;
   readBtn.removeAttribute("disabled");
-  // console.log(content);
 }
 
 /**
@@ -252,24 +250,22 @@ function submit(e) {
  * Sets the default voice to be used by SpeechSynthesis
  */
 function setVoice() {
-  voices = this.getVoices();
-  // console.log(voices);
+  voices = speechSynthesis.getVoices();
   utterance.voice = voices.find((voice) => voice.name.includes("Google US English"));
 }
 
 /**
  * Async function to fetch a random lib from a madlibz api.
  * Adds values to the base logic variables and sets the initial prompt
+ * Uses https://madlibz.herokuapp.com/api#help for source of the libs.
+ * May update for a wider range of lib options.
  * @returns {Object}
  */
 async function fetchLib() {
   readBtn.setAttribute("disabled", "");
-  //! Remove when done testing
   const res = await fetch("http://madlibz.herokuapp.com/api/random");
-  // const res = await fetch("http://madlibz.herokuapp.com/api/random?maxlength=10");
   const body = await res.json();
   if (body.title === "Hello ____!") return fetchLib();
-  // console.log(body);
   blanks = [...body.blanks];
   title = body.title;
   value = body.value;
@@ -286,7 +282,10 @@ newBtn.addEventListener("click", resetLib);
 // triggers the finished lib to be read by SpeechSynth
 readBtn.addEventListener("click", readToggle);
 // Changes the default SpeechSynth voice
-speechSynthesis.addEventListener("voiceschanged", setVoice);
+setVoice(); // FireFox doesn't fire the voiceschanged event on page load like Chrome
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.addEventListener("voiceschanged", setVoice);
+}
 
 // Fetches an inital lib to start with on page load.
 (async () => {
