@@ -11,6 +11,7 @@ const wordInput = document.querySelector("#word-input");
 const titleEl = document.querySelector(".title");
 const libz = document.querySelector(".libz");
 const libzreader = document.querySelector(".libzreader");
+const copyYear = document.querySelector("#copy-year");
 
 // The utterance object for speech synth
 const utterance = new SpeechSynthesisUtterance();
@@ -290,7 +291,7 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 // Fetches an inital lib to start with on page load.
 (async () => {
   speechSynthesis.cancel();
-
+  copyYear.innerText = new Date().getFullYear();
   lib = await fetchLib();
   populatePrompt();
 

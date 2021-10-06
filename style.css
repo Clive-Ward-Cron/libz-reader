@@ -18,9 +18,11 @@ body {
   padding: 0;
   font-family: "Roboto", sans-serif;
   display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
   min-height: 100vh;
   align-items: center;
-  transition: all 1.5s ease;
+  /* transition: all 1.5s ease; */
   /* Arrows  */
   background: linear-gradient(45deg, #ebebeb 45px, transparent 45px) 64px 64px,
     linear-gradient(45deg, #ebebeb 45px, transparent 45px, transparent 91px, #fff 91px, #fff 135px, transparent 135px),
@@ -37,6 +39,16 @@ body {
     );
   background-color: #fff;
   background-size: 127px 128px;
+}
+
+main {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-grow: 1;
+  min-height: 100%;
+  align-items: center;
+  transition: all 1.5s ease;
 }
 
 .libzreader {
@@ -193,4 +205,18 @@ body {
 
 .libzreader button:nth-of-type(1) {
   margin-right: 2%;
+}
+
+footer {
+  border-top: 5px solid #ff4456;
+  background: #ff5566;
+  width: 100%;
+  margin: 1rem 0 0 0;
+  padding: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+footer a {
+  color: black;
 }

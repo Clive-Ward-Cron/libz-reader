@@ -20,23 +20,28 @@
     <title>Libz Reader</title>
   </head>
   <body>
-    <div class="libzreader">
-      <h1>Libz Reader</h1>
-      <h2 class="title"></h2>
-      <div class="content">
-        <p class="libz"></p>
+    <main>
+      <div class="libzreader">
+        <h1>Libz Reader</h1>
+        <h2 class="title"></h2>
+        <div class="content">
+          <p class="libz"></p>
+        </div>
+        <div class="prompt-container">
+          <p class="prompt"></p>
+          <p class="count">Blank Count: <span></span></p>
+        </div>
+        <form class="input-container">
+          <input type="text" name="word-input" id="word-input" autocomplete="off" />
+          <button id="enter">Enter</button>
+        </form>
+        <button id="read">Read</button>
+        <button id="new">New</button>
       </div>
-      <div class="prompt-container">
-        <p class="prompt"></p>
-        <p class="count">Blank Count: <span></span></p>
-      </div>
-      <form class="input-container">
-        <input type="text" name="word-input" id="word-input" autocomplete="off" />
-        <button id="enter">Enter</button>
-      </form>
-      <button id="read">Read</button>
-      <button id="new">New</button>
-    </div>
+    </main>
+    <footer>
+      &copy; Copyright <span id="copy-year">2021</span> <a href="https://www.ward-cron.design">Clive Ward-Cron</a>
+    </footer>
     <script src="main.js"></script>
   </body>
 </html>
