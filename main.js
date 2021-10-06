@@ -82,7 +82,11 @@ function beginReset() {
  */
 async function resetLib() {
   // Set the lib object to be a new lib from the api
-  lib = await fetchLib();
+  try {
+    lib = await fetchLib();
+  } catch (e) {
+    return;
+  }
   beginReset();
   populatePrompt();
 }
@@ -265,8 +269,14 @@ function setVoice() {
 async function fetchLib() {
   readBtn.setAttribute("disabled", "");
   // const res = await fetch("https://madlibz.herokuapp.com/api/random");
-  const res = await fetch("http://madlibz.herokuapp.com/api/random");
-  const body = await res.json();
+  try {
+    const res = await fetch("http://madlibz.herokuapp.com/api/random");
+    const body = await res.json();
+  } catch (e) {
+    console.log(e);
+    titleEl.innerText = "Unable to Fetch Lib";
+    return;
+  }
   if (body.title === "Hello ____!") return fetchLib();
   blanks = [...body.blanks];
   title = body.title;
@@ -293,7 +303,11 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 (async () => {
   speechSynthesis.cancel();
   copyYear.innerText = new Date().getFullYear();
-  lib = await fetchLib();
+  try {
+    lib = await fetchLib();
+  } catch (e) {
+    return;
+  }
   populatePrompt();
 
   // attach the event listeners to the form here
