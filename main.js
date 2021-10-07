@@ -128,7 +128,11 @@ function populatePrompt() {
   if (blanks.length !== 0) {
     // setTimeout used to give element time to fade out
     // before the new prompt is added
-    setTimeout(() => (prompt.innerText = `Enter ${vowels.includes(blanks[0][0]) ? "an" : "a"} ${blanks[0]}`), delay);
+    setTimeout(() => {
+      if (blanks.length !== 0) {
+        prompt.innerText = `Enter ${vowels.includes(blanks[0][0]) ? "an" : "a"} ${blanks[0]}`;
+      }
+    }, delay);
     wordInput.focus();
   } else {
     allWordsEntered = true;
@@ -212,7 +216,9 @@ function generate() {
   const content = value
     .slice(0, -1)
     .map((chunk, i) => {
-      return `${chunk}${words[i] ? words[i] : ""}`;
+      return `${chunk.trim()}${words[i] ? " " + words[i] : ""}${
+        i + 1 > value.slice(0, -1).length - 1 ? "" : value[i + 1].trim().match(/^\W/) ? "" : " "
+      }`;
     })
     .join("");
   libzreader.classList.add("active");
