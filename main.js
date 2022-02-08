@@ -24,6 +24,9 @@ let speech = [];
 let lib, blanks, title, value;
 let isReading = false;
 let allWordsEntered = false;
+// To track what el needs the click event fired on a keyup
+// during btnToggle event listener
+let delayedClick = null;
 
 /**
  * Sanatizes user input that will be displayed
@@ -60,6 +63,7 @@ function beginReset() {
   speechSynthesis.cancel();
   clearInput();
   libzreader.classList.remove("active");
+  newBtn.classList.remove("active");
 
   allWordsEntered = false;
   isReading = false;
@@ -86,7 +90,7 @@ async function resetLib() {
     lib = await fetchLib();
     beginReset();
     populatePrompt();
-  } catch (e) {
+  } catch (error) {
     titleEl.innerText = "Unable to Fetch Lib";
     libzreader.classList.add("active");
     return;
@@ -107,12 +111,26 @@ function restart() {
  * @param {event} e
  * @returns {VoidFunction}
  */
-function enterBtnToggle(e) {
+function btnToggle(e) {
   if (e?.which !== 13 || e?.keyCode !== 13) return;
+  // Set the button to be toggled based on the target.
+  const btn = e.target.tagName === "INPUT" ? enterBtn : e.target;
   if (e.type === "keydown") {
-    enterBtn.classList.add("active");
+    btn.classList.add("active");
+    // If the target is the "New" or "Read" button
+    // delay the click event and fire it on keyup instead.
+    if (btn.id === "new" || btn.id === "read") {
+      e.preventDefault();
+      delayedClick = btn;
+    }
   } else {
-    enterBtn.classList.remove("active");
+    btn.classList.remove("active");
+    // If there is a delayed Click
+    // fire it and clear the variable.
+    if (delayedClick) {
+      delayedClick.click();
+      delayedClick = null;
+    }
   }
 }
 
@@ -268,10 +286,12 @@ function setVoice() {
 }
 
 /**
- * Async function to fetch a random lib from a madlibz api.
+ * Recursive async function to fetch a random lib from a madlibz api.
+ * Will recursively call itself if the demo lib is fetched.
  * Adds values to the base logic variables and sets the initial prompt
  * Uses https://madlibz.herokuapp.com/api#help for source of the libs.
  * May update for a wider range of lib options.
+ *
  * @returns {Object}
  */
 async function fetchLib() {
@@ -294,9 +314,17 @@ async function fetchLib() {
 
 // ----------- Event listeners -----------
 // triggers button animation
-wordInput.addEventListener("keydown", enterBtnToggle);
+wordInput.addEventListener("keydown", btnToggle);
+enterBtn.addEventListener("keydown", btnToggle);
+newBtn.addEventListener("keydown", btnToggle);
+readBtn.addEventListener("keydown", btnToggle);
+
 // reverts button animation
-wordInput.addEventListener("keyup", enterBtnToggle);
+wordInput.addEventListener("keyup", btnToggle);
+enterBtn.addEventListener("keyup", btnToggle);
+newBtn.addEventListener("keyup", btnToggle);
+readBtn.addEventListener("keyup", btnToggle);
+
 // triggers a new lib to be fetched
 newBtn.addEventListener("click", resetLib);
 // triggers the finished lib to be read by SpeechSynth

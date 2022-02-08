@@ -22,7 +22,6 @@ body {
   justify-content: space-around;
   min-height: 100vh;
   align-items: center;
-  /* transition: all 1.5s ease; */
   /* Arrows  */
   background: linear-gradient(45deg, #ebebeb 45px, transparent 45px) 64px 64px,
     linear-gradient(45deg, #ebebeb 45px, transparent 45px, transparent 91px, #fff 91px, #fff 135px, transparent 135px),
@@ -202,6 +201,11 @@ main {
 .libzreader button:active,
 .libzreader button.active {
   top: 2px;
+}
+
+/* TODO: Add accessible focus on inputs and buttons */
+.libzreader button:focus {
+  outline: 2px solid red;
 }
 
 .libzreader button:nth-of-type(1) {
