@@ -1,4 +1,6 @@
-// Needs refactoring
+// Intro text for the website
+const introTitle = "Welcome to Libzreader!";
+const introContent = `Libzreader is my take on a classic word game that I enjoyed playing as a kid. Follow the word prompts to build your own wacky story, then click the "READ" button to have your device read your story aloud to you!<br><br>This project uses Speech Synthesis from the Web Speech API and an external API from <a href="https://github.com/HermanFassett/madlibz">github.com/HermanFassett/madlibz</a> for the stories and prompts.`;
 
 // Elements that are used and modified
 const enterBtn = document.querySelector("#enter");
@@ -27,6 +29,22 @@ let allWordsEntered = false;
 // To track what el needs the click event fired on a keyup
 // during btnToggle event listener
 let delayedClick = null;
+
+/**
+ * Display the website introduction
+ */
+function showIntro() {
+  libzreader.classList.add("active");
+  delayedTextTransition(0, introTitle, introContent);
+  form.addEventListener(
+    "submit",
+    (e) => {
+      e.preventDefault();
+      libzreader.classList.remove("active");
+    },
+    { once: true }
+  );
+}
 
 /**
  * Sanatizes user input that will be displayed
@@ -75,10 +93,20 @@ function beginReset() {
   speech = [];
   blanks = [...lib.blanks];
   value = [...lib.value];
+  delayedTextTransition(delay + (1500 - delay));
+}
+
+/**
+ *
+ * @param {number} delayTime The time to subtract from the transition time of 1500. Defaults to the value of the const 'delay'
+ * @param {string} newTitle The new title. Defaults to empty string
+ * @param {string} newContent The new paragraph content. Defaults to empty string
+ */
+function delayedTextTransition(delayTime = delay, newTitle = "", newContent = "") {
   setTimeout(() => {
-    libz.innerHTML = "";
-    titleEl.innerText = "";
-  }, delay + (1500 - delay));
+    titleEl.innerHTML = newTitle;
+    libz.innerHTML = newContent;
+  }, delayTime);
 }
 
 /**
@@ -240,8 +268,9 @@ function generate() {
     })
     .join("");
   libzreader.classList.add("active");
-  titleEl.innerText = lib.title;
-  libz.innerHTML = content;
+  // titleEl.innerText = lib.title;
+  // libz.innerText = content;
+  delayedTextTransition(0, lib.title, content);
   value = content;
   readBtn.removeAttribute("disabled");
 }
@@ -341,13 +370,14 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.cancel();
     copyYear.innerText = new Date().getFullYear();
     lib = await fetchLib();
-    populatePrompt();
+    populatePrompt(); // Get the prompt ready
+    showIntro(); // Display the website introduction
 
     // attach the event listeners to the form here
     form.addEventListener("submit", submit);
     // prevents held keys spam
     form.addEventListener("keydown", (e) => {
-      if (e.repeat) {
+      if (e.repeat && (e?.which !== 8 || e?.keyCode !== 8)) {
         e.preventDefault();
       }
     });
