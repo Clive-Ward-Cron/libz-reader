@@ -1,6 +1,6 @@
 // Intro text for the website
 const introTitle = "Welcome to Libzreader!";
-const introContent = `Libzreader is my take on a classic word game that I enjoyed playing as a kid. Follow the word prompts to build your own wacky story, then click the "READ" button to have your device read your story aloud to you!<br><br>This project uses Speech Synthesis from the Web Speech API and an external API from <a href="https://github.com/HermanFassett/madlibz">github.com/HermanFassett/madlibz</a> for the stories and prompts.`;
+const introContent = `Libzreader is my take on a classic word game that I enjoyed playing as a kid. Follow the word prompts to build your own wacky story, then click the "READ" button to have your device read your story aloud to you!<br><br>This project uses Speech Synthesis from the Web Speech API and an external API from <a href="https://github.com/HermanFassett/madlibz" target="_blank">github.com/HermanFassett/madlibz</a> for the stories and prompts.`;
 
 // Elements that are used and modified
 const enterBtn = document.querySelector("#enter");
