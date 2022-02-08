@@ -36,8 +36,16 @@ body {
       transparent 158px,
       #ebebeb 158px
     );
+  color: #333;
   background-color: #fff;
   background-size: 127px 128px;
+}
+
+a {
+  color: inherit;
+}
+a:hover {
+  text-decoration-thickness: 3px;
 }
 
 main {
@@ -200,12 +208,8 @@ main {
 
 .libzreader button:active,
 .libzreader button.active {
+  border-color: #e60017;
   top: 2px;
-}
-
-/* TODO: Add accessible focus on inputs and buttons */
-.libzreader button:focus {
-  outline: 2px solid red;
 }
 
 .libzreader button:nth-of-type(1) {
@@ -222,8 +226,15 @@ footer {
   text-align: center;
 }
 
-footer a {
-  color: black;
+/* Focus Styles */
+button:focus,
+input[type="text"]:focus {
+  border-color: #e60017;
+}
+a:focus {
+  outline: none;
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
 }
 
 @media only screen and (max-width: 425px) {

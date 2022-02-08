@@ -119,7 +119,7 @@ function btnToggle(e) {
     btn.classList.add("active");
     // If the target is the "New" or "Read" button
     // delay the click event and fire it on keyup instead.
-    if (btn.id === "new" || btn.id === "read") {
+    if (btn.id === "new" || btn.id === "read" || btn.innerText === "RESTART") {
       e.preventDefault();
       delayedClick = btn;
     }
