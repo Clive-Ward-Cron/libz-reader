@@ -28,9 +28,8 @@
           <p class="libz">
             Libzreader is my take on a classic word game that I enjoyed playing as a kid. Follow the word prompts to
             build your own wacky story, then click the "READ" button to have your device read your story aloud to
-            you!<br /><br />This project uses Speech Synthesis from the Web Speech API and an external API from
-            <a href="https://github.com/HermanFassett/madlibz" target="_blank">github.com/HermanFassett/madlibz</a> for
-            the stories and prompts.
+            you!<br /><br />This project uses Speech Synthesis from the Web Speech API with Netlify Functions for accessing
+            the stories and prompts stored in Google's Firebase Firestore.
           </p>
         </div>
         <div class="prompt-container">
@@ -46,9 +45,9 @@
       </div>
     </main>
     <footer>
-      &copy; Copyright <span id="copy-year">2021</span>
+      &copy; Copyright <span id="copy-year">2024</span>
       <a href="https://www.ward-cron.design" target="_blank">Clive Ward-Cron</a>
     </footer>
-    <script src="main.js"></script>
+    <script src="js/main.js" type="module"></script>
   </body>
 </html>

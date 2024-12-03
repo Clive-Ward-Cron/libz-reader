@@ -1,0 +1,21 @@
+{
+  "name": "libz-reader",
+  "version": "1.0.0",
+  "description": "Libzreader is hobby project made to creatively explore web technologies.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hobby"
+  ],
+  "author": "Clive Ward-Cron",
+  "license": "ISC",
+  "devDependencies": {
+    "dotenv": "^16.4.7",
+    "netlify-cli": "^17.38.0"
+  },
+  "dependencies": {
+    "firebase": "^11.0.2"
+  }
+}

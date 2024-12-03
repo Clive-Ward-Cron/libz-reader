@@ -1,0 +1,8 @@
+/js/firebase/firebase-config.json
+/seed
+Dockerfile
+.dockerignore
+# Local Netlify folder
+.netlify
+*.env*
+*node_modules

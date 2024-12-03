@@ -1,6 +1,7 @@
 // Intro text for the website
 const introTitle = "Welcome to Libzreader!";
-const introContent = `Libzreader is my take on a classic word game that I enjoyed playing as a kid. Follow the word prompts to build your own wacky story, then click the "READ" button to have your device read your story aloud to you!<br><br>This project uses Speech Synthesis from the Web Speech API and an external API from <a href="https://github.com/HermanFassett/madlibz" target="_blank">github.com/HermanFassett/madlibz</a> for the stories and prompts.`;
+const introContent = `Libzreader is my take on a classic word game that I enjoyed playing as a kid. Follow the word prompts to build your own wacky story, then click the "READ" button to have your device read your story aloud to you!<br><br>This project uses Speech Synthesis from the Web Speech API with Netlify Functions for accessing
+            the stories and prompts stored in Google's Firebase Firestore.`;
 
 // Elements that are used and modified
 const enterBtn = document.querySelector("#enter");
@@ -14,6 +15,7 @@ const titleEl = document.querySelector(".title");
 const libz = document.querySelector(".libz");
 const libzreader = document.querySelector(".libzreader");
 const copyYear = document.querySelector("#copy-year");
+const count = sessionStorage.getItem("templateCount") ?? await getCount()
 
 // The utterance object for speech synth
 const utterance = new SpeechSynthesisUtterance();
@@ -23,7 +25,7 @@ const delay = 250;
 const vowels = ["a", "e", "i", "o", "u"];
 let words = [];
 let speech = [];
-let lib, blanks, title, value;
+let lib, blanks, title, value, voices;
 let isReading = false;
 let allWordsEntered = false;
 // To track what el needs the click event fired on a keyup
@@ -326,19 +328,44 @@ function setVoice() {
 async function fetchLib() {
   readBtn.setAttribute("disabled", "");
   try {
-    const res = await fetch("https://madlibz.herokuapp.com/api/random");
-    const body = await res.json();
-    if (body.title === "Hello ____!") return fetchLib();
-    blanks = [...body.blanks];
-    title = body.title;
-    value = body.value;
-    return body;
+    const template = await getTemplate()
+
+    blanks = [...template.blanks];
+    title = template.title;
+    value = template.value;
+    return template;
   } catch (e) {
     console.log(e);
     titleEl.innerText = "Unable to Fetch Lib";
     libzreader.classList.add("active");
     return;
   }
+}
+
+async function getTemplate() {
+  const randomTemplateId = Math.floor((Math.random() * count) + 1)
+  let template = JSON.parse(localStorage.getItem(`templateId${randomTemplateId}`))
+  if (!template) {
+    const response = await fetch(".netlify/functions/getTemplate", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: randomTemplateId
+      })
+    })
+    template = await response.json();
+    localStorage.setItem(`templateId${randomTemplateId}`, JSON.stringify(template))
+  }
+  return template
+}
+
+async function getCount() {
+  const response = await fetch('.netlify/functions/getTemplateCount')
+  const count = await response.json()
+  sessionStorage.setItem("templateCount",count)
+  return count
 }
 
 // ----------- Event listeners -----------
@@ -367,6 +394,7 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 // Fetches an inital lib to start with on page load.
 (async () => {
   try {
+
     speechSynthesis.cancel();
     copyYear.innerText = new Date().getFullYear();
     lib = await fetchLib();
@@ -382,6 +410,7 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
       }
     });
   } catch (e) {
+    console.log(e)
     return;
   }
 })();
